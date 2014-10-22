@@ -1,5 +1,5 @@
 
-policy_module(plex, 0.9.9)
+policy_module(plex, 1.0.0)
 
 #
 # Tunables

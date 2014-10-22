@@ -1,0 +1,206 @@
+
+policy_module(plex, 0.9.9)
+
+#
+# Tunables
+#
+
+# Allows plex to read any file or directory on the system.
+gen_tunable(plex_access_all_ro, false)
+
+# Allows plex to manage any file or directory on the system.
+gen_tunable(plex_access_all_rw, false)
+
+# Allow plex to manage public_content_rw_t labeled files and directories.
+# By default, plex can only read public_content_rw_t file and directories.
+gen_tunable(allow_plex_anon_write, false)
+
+# Allows plex to list all directories. This enables the directory browser in 
+# the web ui to work. By default this boolean is enabled, it can be disabled 
+# for tighter security. 
+#
+# If this is disabled, directories cannot be browsed and paths must be typed 
+# in when adding libraries to plex.
+#
+# Attempting to use the directory browser ui with this disabled will 
+# generate a lot of AVC denials.
+gen_tunable(allow_plex_list_all_dirs, true)
+
+# Allows plex to manage files in users home directories.
+gen_tunable(allow_plex_access_home_dirs_rw, false)
+
+#
+# Access policies
+#
+
+# The target domain
+type plex_t;
+
+
+# Main entry point and executables
+type plex_exec_t;
+
+# Daemon transition
+init_daemon_domain(plex_t, plex_exec_t)
+
+# Allow executing own executables
+can_exec(plex_t, plex_exec_t)
+
+# Define init script domain and transition
+type plex_initrc_exec_t;
+init_script_file(plex_initrc_exec_t)
+
+# Create a domain for plexmediaserver config file and
+# allow plex_t to read it.
+type plex_etc_t;
+files_config_file(plex_etc_t)
+#files_read_etc_files(plex_t)
+allow plex_t plex_etc_t:file read_file_perms;
+
+# Create a domain for plexmediaserver variable files
+# and allow plex_t to manage them.
+type plex_var_lib_t;
+files_type(plex_var_lib_t)
+files_search_var_lib(plex_t)
+manage_dirs_pattern(plex_t, plex_var_lib_t, plex_var_lib_t)
+manage_files_pattern(plex_t, plex_var_lib_t, plex_var_lib_t)
+manage_lnk_files_pattern(plex_t, plex_var_lib_t, plex_var_lib_t)
+
+# Needed for python. It is unusual for a program to want exec inside /var/lib
+# This is something that needs to be looked at.
+can_exec(plex_t, plex_var_lib_t)
+
+
+
+# Create a pair customizable type for labeling content
+# allowed to be shared by plex. A read only type, and a managable type.
+type plex_content_t;
+files_type(plex_content_t)
+read_files_pattern(plex_t, plex_content_t, plex_content_t)
+
+type plex_content_rw_t;
+files_type(plex_content_rw_t)
+manage_dirs_pattern(plex_t, plex_content_t, plex_content_t)
+manage_files_pattern(plex_t, plex_content_t, plex_content_t)
+
+# Allow plex_t to read public content domains.
+miscfiles_read_public_files(plex_t)
+
+# Temporary files
+type plex_tmp_t;
+files_tmp_file(plex_tmp_t)
+manage_dirs_pattern(plex_t, plex_tmp_t, plex_tmp_t)
+manage_files_pattern(plex_t, plex_tmp_t, plex_tmp_t)
+manage_lnk_files_pattern(plex_t, plex_tmp_t, plex_tmp_t)
+files_tmp_filetrans(plex_t, plex_tmp_t, { file dir })
+
+# Needed for python.
+can_exec(plex_t, plex_tmp_t)
+
+type plex_tmpfs_t;
+files_tmp_file(plex_tmpfs_t)
+manage_dirs_pattern(plex_t, plex_tmpfs_t, plex_tmpfs_t)
+manage_files_pattern(plex_t, plex_tmpfs_t, plex_tmpfs_t)
+manage_lnk_files_pattern(plex_t, plex_tmpfs_t, plex_tmpfs_t)
+fs_tmpfs_filetrans(plex_t, plex_tmpfs_t, { dir file lnk_file })
+
+# Needed for python.
+can_exec(plex_t, plex_tmpfs_t)
+
+
+
+#
+# Tunable policies
+#
+tunable_policy(`plex_access_all_ro',`
+        fs_read_noxattr_fs_files(plex_t)
+        auth_read_all_dirs_except_shadow(plex_t)
+        auth_read_all_symlinks_except_shadow(plex_t)
+        auth_read_all_files_except_shadow(plex_t)
+')
+
+tunable_policy(`plex_access_all_rw',`
+        fs_read_noxattr_fs_files(plex_t)
+        auth_manage_all_files_except_shadow(plex_t)
+')
+
+tunable_policy(`allow_plex_anon_write',`
+	miscfiles_manage_public_files(plex_t)
+')
+
+tunable_policy(`allow_plex_list_all_dirs',`
+        auth_read_all_dirs_except_shadow(plex_t)
+	auth_read_all_symlinks_except_shadow(plex_t)
+	files_dontaudit_getattr_all_files(plex_t)
+')
+
+tunable_policy(`allow_plex_access_home_dirs_rw',`
+        userdom_manage_user_home_content_dirs(plex_t)
+        userdom_manage_user_home_content_files(plex_t)
+        userdom_manage_user_home_content_symlinks(plex_t)
+')
+
+
+
+
+#
+# Networking
+#
+
+allow plex_t self:udp_socket create_socket_perms;
+allow plex_t self:tcp_socket create_stream_socket_perms;
+allow plex_t self:unix_dgram_socket { create_socket_perms sendto };
+allow plex_t self:netlink_route_socket r_netlink_socket_perms;
+
+corenet_tcp_connect_all_ports(plex_t)
+corenet_tcp_sendrecv_all_if(plex_t)
+corenet_tcp_sendrecv_all_nodes(plex_t)
+corenet_tcp_sendrecv_all_ports(plex_t)
+corenet_tcp_bind_all_nodes(plex_t)
+corenet_tcp_bind_generic_port(plex_t)
+corenet_udp_sendrecv_all_if(plex_t)
+corenet_udp_sendrecv_all_nodes(plex_t)
+corenet_udp_sendrecv_all_ports(plex_t)
+corenet_udp_bind_all_nodes(plex_t)
+corenet_udp_bind_generic_port(plex_t)
+
+#
+# System and Process stuff
+#
+
+allow plex_t self:process { getcap setcap signal_perms setsched };
+fs_rw_anon_inodefs_files(plex_t)
+fs_getattr_all_fs(plex_t)
+init_read_state(plex_t)
+
+# Allow reading system locale
+miscfiles_read_localization(plex_t)
+
+# Allow reading random devices
+dev_read_rand(plex_t)
+dev_read_urand(plex_t)
+
+# Allow executing /usr/bin commands. Plex needs this to
+# invoke python.
+corecmd_exec_bin(plex_t)
+
+# Allow use of a shell (sh, bash, etc)
+corecmd_exec_shell(plex_t)
+
+# Allow configuring the dynamic linker
+libs_exec_ldconfig(plex_t)
+
+# Allow reading system state
+kernel_read_system_state(plex_t)
+kernel_read_network_state(plex_t)
+kernel_read_fs_sysctls(plex_t)
+
+# Allow reading system network configuration
+sysnet_read_config(plex_t)
+
+# This one is questionable. Plex attempts to list the contents of /proc/<pid> for
+# number of <pids> that seem very unrelated. If access is denied plex will not start.
+# I'm not sure why it does this, but in the mean time plex_t 
+# needs the ability to read other domains state.
+domain_read_all_domains_state(plex_t)
+

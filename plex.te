@@ -16,15 +16,14 @@ gen_tunable(plex_access_all_rw, false)
 gen_tunable(allow_plex_anon_write, false)
 
 # Allows plex to list all directories. This enables the directory browser in 
-# the web ui to work. By default this boolean is enabled, it can be disabled 
-# for tighter security. 
+# the web ui to browse the filesystem. 
 #
-# If this is disabled, directories cannot be browsed and paths must be typed 
+# While this is disabled, directories cannot be browsed and paths must be typed 
 # in when adding libraries to plex.
 #
 # Attempting to use the directory browser ui with this disabled will 
 # generate a lot of AVC denials.
-gen_tunable(allow_plex_list_all_dirs, true)
+gen_tunable(allow_plex_list_all_dirs, false)
 
 # Allows plex to manage files in users home directories.
 gen_tunable(allow_plex_access_home_dirs_rw, false)

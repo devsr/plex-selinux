@@ -1,3 +1,11 @@
+# Copyright (c) 2014 Devin Reid
+#
+# Permission is granted to use, distribute and modify this work
+# in compliance with the terms of the MIT license.
+#
+# A copy of the MIT license can be found in the LICENSE file that
+# accompanied this work or by visiting http://opensource.org/licenses/MIT
+
 include /usr/share/selinux/devel/Makefile
 
 define relabel-plex-files

@@ -1,4 +1,10 @@
-
+# Copyright (c) 2014 Devin Reid
+#
+# Permission is granted to use, distribute and modify this work
+# in compliance with the terms of the MIT license.
+#
+# A copy of the MIT license can be found in the LICENSE file that
+# accompanied this work or by visiting http://opensource.org/licenses/MIT
 
 # /etc
 /etc/sysconfig/PlexMediaServer		--	gen_context(system_u:object_r:plex_etc_t,s0)

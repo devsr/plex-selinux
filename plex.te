@@ -158,7 +158,8 @@ allow plex_t self:tcp_socket create_stream_socket_perms;
 allow plex_t self:unix_dgram_socket { create_socket_perms sendto };
 allow plex_t self:netlink_route_socket r_netlink_socket_perms;
 
-corenet_tcp_connect_all_ports(plex_t)
+corenet_tcp_connect_generic_port(plex_t)
+corenet_tcp_connect_http_port(plex_t)
 corenet_tcp_sendrecv_all_if(plex_t)
 corenet_tcp_sendrecv_all_nodes(plex_t)
 corenet_tcp_sendrecv_all_ports(plex_t)

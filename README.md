@@ -2,7 +2,7 @@
 
 *DISCLAIMER: This project is not an official Plex project, and is not supported or endorsed by Plex.*
 
-This is an SELinux policy module that defines a domain to confine Plex Media Server and associated processes. By default, Plex Media Server runs in the initrc_t domain, this gives Plex Media Server far more access to the system than it needs to do its job. By installing this policy module Plex Media Server will run in its own domain with a tailored set of access controls.
+This is an SELinux policy module that defines a domain to confine Plex Media Server and associated processes. By default, Plex Media Server runs in the `initrc_t` domain. This gives Plex Media Server far more access to the system than it needs to do its job. Installing this policy module will confine Plex Media Server its own domain with a tailored set of access controls.
 
 
 ## Building
@@ -69,7 +69,7 @@ A file's security context can be changed temporarily using `chcon`. These change
 
 A file's security context can be changed permanently by using `semanage fcontext` to define the default security context for a given set of files and then using `restorecon` to apply those labels.
 
-	$ semanage fcontext -a -t "plex_content_t /usr/share/my_media_library(/*.)?"
+	$ semanage fcontext -a -t plex_content_t "/usr/share/my_media_library(/*.)?"
 	$ restorecon -v -R /usr/share/my_media_library
 	
 This policy module defines the following file contexts:
@@ -110,7 +110,7 @@ Processes confined by `plex_t` have permission to execute files in the following
 * `bin_t`
 * `shell_exec_t`
 
-Processes created using those domains will be confined by `plex_t` access controls.
+Processes created from executables in these contexts will be confined by `plex_t`.
 
 ##### Shared contexts
 
@@ -139,7 +139,7 @@ May send and receive UDP packets to/from all ports.
 
 ### Booleans
 
-SELinux booleans can be used to adjust the access controls enforced for `plex_t`. The adjustment is a loosen enforcement giving the `plex_t` processes more access to the system. 
+SELinux booleans can be used to adjust the access controls enforced for `plex_t`. Default settings (off) result in tightest security. Enabling a boolean will loosen access controls and allow `plex_t` confined processes more access to the system.
 
 The status of booleans can be inspected using `getsebool`
 

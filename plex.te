@@ -194,6 +194,12 @@ corecmd_exec_bin(plex_t)
 # Allow use of a shell (sh, bash, etc)
 corecmd_exec_shell(plex_t)
 
+# Allow use of rsync without domain transition.
+gen_require(`
+	type rsync_exec_t;
+')
+can_exec(plex_t, rsync_exec_t)
+
 # Allow configuring the dynamic linker
 libs_exec_ldconfig(plex_t)
 

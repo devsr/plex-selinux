@@ -4,6 +4,10 @@
 
 This is an SELinux policy module that defines a domain to confine Plex Media Server and associated processes. By default, Plex Media Server runs in the `initrc_t` domain. This gives Plex Media Server far more access to the system than it needs to do its job. Installing this policy module will confine Plex Media Server its own domain with a tailored set of access controls.
 
+**This policy module has received only limited testing and may not allow all Plex Media Server features to operate correctly at this time.** It has been developed for CentOS 6.5 and may not work correctly in other distros yet. 
+
+Bug reports and patches are welcome.
+
 
 ## Building
 
@@ -14,8 +18,6 @@ In order to build and install this policy module you will need the following pac
 * make
 * selinux-policy
 * policycoreutils-python
-
-This policy module has been developed for CentOS 6.5, it may not work correctly in other distros.
 
 ### Build
 
@@ -157,6 +159,34 @@ A boolean can be turned on or off using `setsebool`
 `# setsebool allow_plex_list_all_dirs on`
 
 A `-P` option can be passed to `setsebool` that makes the setting persist across reboots.
+
+This policy modules defines the following booleans:
+
+##### plex\_access\_all\_ro
+
+Allow processes contained by `plex_t` to read all files and directories.
+
+##### plex\_access\_all\_rw
+
+Allow processes contained by `plex_t` to manage (read, write, create, delete) all files and directories.
+
+##### allow\_plex\_list\_all\_dirs
+
+Allow processes contained by `plex_t` to list (search and read) all directories. 
+
+Note that this boolean will allow the directory browser in the web ui to work correctly. Attempting to use the directory browser without enabling this boolean will cause many AVC denials to be logged. If this boolean is off, directories paths should be typed in the path bar instead of browsed for. 
+
+##### allow\_plex\_anon\_write
+
+Allow processes contained by `plex_t` to manage (read, write, create, delete) files and directories labeled with the `public_content_rw_t` context.
+
+##### allow\_plex\_access\_home\_dirs\_rw
+
+Allow processes contained by `plex_t` to manage (read, write, create, delete) files and directories in user home directories.
+
+
+
+
 
 
 

@@ -129,7 +129,7 @@ Processes created from executables in these contexts will be confined by `plex_t
 
 ##### Shared contexts
 
-Processes confined by `plex_t` also have read access to the following shared file contexts:
+Processes confined by `plex_t` have read access to the following shared file contexts:
 
 * `public_content_t`
 * `public_content_rw_t`
@@ -140,18 +140,12 @@ This is useful if you want label media files to be readable by processes in doma
 
 ### Networking
 
-Processes confined by `plex_t` have the following network capabilities.
+Processes confined by `plex_t` have the following network capabilities:
 
-May connect TCP sockets to:
-
-* `port_t`
-* `http_port_t`
-
-May bind UDP sockets to:
-
-* `port_t`
-
-May send and receive UDP packets to/from all ports.
+* May connect TCP sockets to `port_t`
+* May connect TCP sockets to `http_port_t` 
+* May bind UDP sockets to `port_t`
+* May send and receive UDP packets to/from all ports.
 
 
 ### Booleans
@@ -193,7 +187,7 @@ Allow processes contained by `plex_t` to manage (read, write, create, delete) al
 
 Allow processes contained by `plex_t` to list (search and read) all directories. 
 
-Note that this boolean will allow the directory browser in the web ui to work correctly. Attempting to use the directory browser without enabling this boolean will cause many AVC denials to be logged. If this boolean is off, directories paths should be typed in the path bar instead of browsed for.
+Note that this boolean will allow the directory browser in Plex's Web UI to work correctly. Attempting to use the directory browser without enabling this boolean will cause a large number of AVC denials to be logged. If this boolean is off, directory paths should be typed in the path bar instead of browsed for.
 <br />
 <br /> 
 
@@ -208,11 +202,6 @@ Allow processes contained by `plex_t` to manage (read, write, create, delete) fi
 Allow processes contained by `plex_t` to manage (read, write, create, delete) files and directories in user home directories.
 <br />
 <br />
-
-
-
-
-
 
 ---
 

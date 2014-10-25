@@ -86,8 +86,8 @@ read_files_pattern(plex_t, plex_content_t, plex_content_t)
 
 type plex_content_rw_t;
 files_type(plex_content_rw_t)
-manage_dirs_pattern(plex_t, plex_content_t, plex_content_t)
-manage_files_pattern(plex_t, plex_content_t, plex_content_t)
+manage_dirs_pattern(plex_t, plex_content_rw_t, plex_content_rw_t)
+manage_files_pattern(plex_t, plex_content_rw_t, plex_content_rw_t)
 
 # Allow plex_t to read public content domains.
 miscfiles_read_public_files(plex_t)

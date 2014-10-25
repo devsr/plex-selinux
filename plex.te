@@ -60,7 +60,6 @@ init_script_file(plex_initrc_exec_t)
 # allow plex_t to read it.
 type plex_etc_t;
 files_config_file(plex_etc_t)
-#files_read_etc_files(plex_t)
 allow plex_t plex_etc_t:file read_file_perms;
 
 # Create a domain for plexmediaserver variable files
@@ -72,8 +71,7 @@ manage_dirs_pattern(plex_t, plex_var_lib_t, plex_var_lib_t)
 manage_files_pattern(plex_t, plex_var_lib_t, plex_var_lib_t)
 manage_lnk_files_pattern(plex_t, plex_var_lib_t, plex_var_lib_t)
 
-# Needed for python. It is unusual for a program to want exec inside /var/lib
-# This is something that needs to be looked at.
+# Needed for python. 
 can_exec(plex_t, plex_var_lib_t)
 
 
@@ -82,6 +80,7 @@ can_exec(plex_t, plex_var_lib_t)
 # allowed to be shared by plex. A read only type, and a managable type.
 type plex_content_t;
 files_type(plex_content_t)
+list_dirs_pattern(plex_t, plex_content_t, plex_content_t)
 read_files_pattern(plex_t, plex_content_t, plex_content_t)
 
 type plex_content_rw_t;

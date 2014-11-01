@@ -4,7 +4,7 @@
 
 This is an SELinux policy module that defines a domain to confine Plex Media Server and associated processes. By default, Plex Media Server runs in the `initrc_t` domain. This gives Plex Media Server far more access to the system than it needs to do its job. Installing this policy module will confine Plex Media Server in its own domain with a tailored set of access controls.
 
-**This policy module has received only limited testing and may not allow all Plex Media Server features to operate correctly at this time.** It has been developed for CentOS 6.5 and may not work correctly in other distros yet. 
+**This policy module has received only limited testing and may not allow all Plex Media Server features to operate correctly at this time.** It has been developed for CentOS 6.6 and may not work correctly in other distros yet. 
 
 Bug reports and patches are welcome.
 

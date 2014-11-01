@@ -1,10 +1,17 @@
 # SELinux policy module for Plex Media Server
 
-*DISCLAIMER: This project is not an official Plex project, and is not supported or endorsed by Plex.*
+*DISCLAIMER: This project is not an official Plex project, and is not supported 
+or endorsed by Plex.*
 
-This is an SELinux policy module that defines a domain to confine Plex Media Server and associated processes. By default, Plex Media Server runs in the `initrc_t` domain. This gives Plex Media Server far more access to the system than it needs to do its job. Installing this policy module will confine Plex Media Server in its own domain with a tailored set of access controls.
+This is an SELinux policy module that defines a domain to confine Plex Media 
+Server and associated processes. By default, Plex Media Server runs in the
+`initrc_t` domain. This gives Plex Media Server far more access to the system
+than it needs to do its job. Installing this policy module will confine Plex
+Media Server in its own domain with a tailored set of access controls.
 
-**This policy module has received only limited testing and may not allow all Plex Media Server features to operate correctly at this time.** It has been developed for CentOS 6.6 and may not work correctly in other distros yet. 
+**This policy module has received only limited testing and may not allow all
+Plex Media Server features to operate correctly at this time.** It has been
+developed for CentOS 6.6 and may not work correctly in other distros yet. 
 
 Bug reports and patches are welcome.
 
@@ -13,7 +20,8 @@ Bug reports and patches are welcome.
 
 ### Requirements
 
-In order to build and install this policy module you will need the following packages installed:
+In order to build and install this policy module you will need the following
+packages installed:
 
 * make
 * selinux-policy
@@ -25,7 +33,8 @@ In order to build and install this policy module you will need the following pac
 
 ### Install 
 
-Installs the policy package and relabels Plex Media Server files to new file contexts.
+Installs the policy package and relabels Plex Media Server files to new file
+contexts.
 
 (as root)
 
@@ -33,7 +42,8 @@ Installs the policy package and relabels Plex Media Server files to new file con
 
 ### Uninstall
 
-Uninstalls the policy module from the system and relabels Plex Media Server files to the default file contexts. 
+Uninstalls the policy module from the system and relabels Plex Media Server
+files to the default file contexts. 
 
 (as root)
 
@@ -44,9 +54,11 @@ Uninstalls the policy module from the system and relabels Plex Media Server file
 
 ### Domain
 
-SELinux uses domains to label processes. The domain of a confined process defines what access controls the process is subjected to.
+SELinux uses domains to label processes. The domain of a confined process
+defines what access controls the process is subjected to.
 
-The security context of a process can be inspected by adding the `-Z` option to the `ps` command
+The security context of a process can be inspected by adding the `-Z` option to
+the `ps` command
 
 	$ ps -eZ | grep plex_t
 	unconfined_u:system_r:plex_t:s0  7174 ?        00:00:04 Plex Media Serv
@@ -58,18 +70,24 @@ This policy module defines the domain `plex_t` for Plex Media Server processes.
 
 ### File Contexts
 
-SELinux requires that files be labeled with a security context so it knows what access controls to apply. This security context is usually stored in an extended attribute on the file.
+SELinux requires that files be labeled with a security context so it knows what
+access controls to apply. This security context is usually stored in an extended
+attribute on the file.
 
-The security context of a file can be inspected by using the `-Z` option with the `ls` command.
+The security context of a file can be inspected by using the `-Z` option with
+the `ls` command.
 
 	$ ls -Z /var/lib/plexmediaserver
 	drwxr-xr-x. plex plex unconfined_u:object_r:plex_var_lib_t:s0 Library
 
-A file's security context can be changed temporarily using `chcon`. These changes to not survive a relabeling. 
+A file's security context can be changed temporarily using `chcon`. These
+changes to not survive a relabeling. 
 
 	$ chcon -R /usr/share/my_media_library 
 
-A file's security context can be changed permanently by using `semanage fcontext` to define the default security context for a given set of files and then using `restorecon` to apply those labels.
+A file's security context can be changed permanently by using `semanage fcontext`
+to define the default security context for a given set of files and then using
+`restorecon` to apply those labels.
 
 	$ semanage fcontext -a -t plex_content_t "/usr/share/my_media_library(/*.)?"
 	$ restorecon -v -R /usr/share/my_media_library
@@ -78,7 +96,9 @@ This policy module defines the following file contexts:
 
 ##### plex\_content\_t and plex\_content\_rw\_t
 
-These file contexts are for labeling media files and directories that processes confined by `plex_t` should be allowed to read (`plex_content_t`) or manage (`plex_content_rw_t`).
+These file contexts are for labeling media files and directories that processes
+confined by `plex_t` should be allowed to read (`plex_content_t`) or manage
+(`plex_content_rw_t`).
 <br />
 <br />
 ##### plex\_etc\_t
@@ -95,25 +115,33 @@ Plex Media Server init.d scripts.
 
 ##### plex\_exec\_t
 
-Plex Media Server executables. Files labeled with this context will create processes in the `plex_t` domain when called from certain domains (notably `init_t` and `initrc_t`). Generally a transition to `plex_t` will not occur if the calling process is `unconfined_t` (the standard user context in the targeted policy). This means if a user calls the executable from a shell the resulting process **will not** be confined.
+Plex Media Server executables. Files labeled with this context will create
+processes in the `plex_t` domain when called from certain domains
+(notably `init_t` and `initrc_t`). Generally a transition to `plex_t` will not
+occur if the calling process is `unconfined_t` (the standard user context in
+the targeted policy). This means if a user calls the executable from a shell
+the resulting process **will not** be confined.
 <br />
 <br />
 
 ##### plex\_var\_lib\_t
 
-Plex Media Server `/var/lib` files. Processes confined by `plex_t` can manage files and directories in this domain.
+Plex Media Server `/var/lib` files. Processes confined by `plex_t` can manage
+files and directories in this domain.
 <br />
 <br />
 
 ##### plex\_tmp\_t and plex\_tmpfs\_t
 
-Plex Media Server temporary files and objects. Processes confined by `plex_t` can manage files and directories in this domain.
+Plex Media Server temporary files and objects. Processes confined by `plex_t`
+can manage files and directories in this domain.
 <br />
 <br />
 
 ##### Executable contexts
 
-Processes confined by `plex_t` have permission to execute files in the following security contexts:
+Processes confined by `plex_t` have permission to execute files in the
+following security contexts:
 
 * `plex_exec_t`
 * `plex_var_lib_t`
@@ -129,12 +157,14 @@ Processes created from executables in these contexts will be confined by `plex_t
 
 ##### Shared contexts
 
-Processes confined by `plex_t` have read access to the following shared file contexts:
+Processes confined by `plex_t` have read access to the following
+shared file contexts:
 
 * `public_content_t`
 * `public_content_rw_t`
 
-This is useful if you want label media files to be readable by processes in domains other than `plex_t` (Apache, NFS, Samba, FTP, etc) 
+This is useful if you want label media files to be readable by processes in
+domains other than `plex_t` (Apache, NFS, Samba, FTP, etc) 
 <br />
 <br />
 
@@ -150,7 +180,10 @@ Processes confined by `plex_t` have the following network capabilities:
 
 ### Booleans
 
-SELinux booleans can be used to adjust the access controls enforced for `plex_t`. Default settings (off) result in tightest security. Enabling a boolean will loosen access controls and allow `plex_t` confined processes more access to the system.
+SELinux booleans can be used to adjust the access controls enforced for
+`plex_t`. Default settings (off) result in tightest security. Enabling a boolean
+will loosen access controls and allow `plex_t` confined processes more access
+to the system.
 
 The status of booleans can be inspected using `getsebool`
 
@@ -167,7 +200,8 @@ A boolean can be turned on or off using `setsebool`
 	
 `# setsebool allow_plex_list_all_dirs on`
 
-A `-P` option can be passed to `setsebool` that makes the setting persist across reboots.
+A `-P` option can be passed to `setsebool` that makes the setting persist
+across reboots.
 
 This policy modules defines the following booleans:
 
@@ -179,7 +213,8 @@ Allow processes contained by `plex_t` to read all files and directories.
 
 ##### plex\_access\_all\_rw
 
-Allow processes contained by `plex_t` to manage (read, write, create, delete) all files and directories.
+Allow processes contained by `plex_t` to manage (read, write, create, delete)
+all files and directories.
 <br />
 <br />
 
@@ -187,19 +222,24 @@ Allow processes contained by `plex_t` to manage (read, write, create, delete) al
 
 Allow processes contained by `plex_t` to list (search and read) all directories. 
 
-Note that this boolean will allow the directory browser in Plex's Web UI to work correctly. Attempting to use the directory browser without enabling this boolean will cause a large number of AVC denials to be logged. If this boolean is off, directory paths should be typed in the path bar instead of browsed for.
+Note that this boolean will allow the directory browser in Plex's Web UI to work
+correctly. Attempting to use the directory browser without enabling this boolean
+will cause a large number of AVC denials to be logged. If this boolean is off,
+directory paths should be typed in the path bar instead of browsed for.
 <br />
 <br /> 
 
 ##### allow\_plex\_anon\_write
 
-Allow processes contained by `plex_t` to manage (read, write, create, delete) files and directories labeled with the `public_content_rw_t` context.
+Allow processes contained by `plex_t` to manage (read, write, create, delete)
+files and directories labeled with the `public_content_rw_t` context.
 <br />
 <br />
 
 ##### allow\_plex\_access\_home\_dirs\_rw
 
-Allow processes contained by `plex_t` to manage (read, write, create, delete) files and directories in user home directories.
+Allow processes contained by `plex_t` to manage (read, write, create, delete)
+files and directories in user home directories.
 <br />
 <br />
 
@@ -207,4 +247,5 @@ Allow processes contained by `plex_t` to manage (read, write, create, delete) fi
 
 *Copyright (c) 2014 Devin Reid*
 
-*This project is licensed under the terms of the MIT license. Please see included LICENSE file or visit http://opensource.org/licenses/MIT*
+*This project is licensed under the terms of the MIT license. Please see
+included LICENSE file or visit http://opensource.org/licenses/MIT*

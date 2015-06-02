@@ -89,7 +89,7 @@ A file's security context can be changed permanently by using `semanage fcontext
 to define the default security context for a given set of files and then using
 `restorecon` to apply those labels.
 
-	$ semanage fcontext -a -t plex_content_t "/usr/share/my_media_library(/*.)?"
+	$ semanage fcontext -a -t plex_content_t "/usr/share/my_media_library(/.*)?"
 	$ restorecon -v -R /usr/share/my_media_library
 	
 This policy module defines the following file contexts:

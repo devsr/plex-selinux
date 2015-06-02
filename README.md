@@ -81,7 +81,7 @@ the `ls` command.
 	drwxr-xr-x. plex plex unconfined_u:object_r:plex_var_lib_t:s0 Library
 
 A file's security context can be changed temporarily using `chcon`. These
-changes to not survive a relabeling. 
+changes will not survive a relabeling. 
 
 	$ chcon -R /usr/share/my_media_library 
 

@@ -1,19 +1,36 @@
 # SELinux policy module for Plex Media Server
 
-*DISCLAIMER: This project is not an official Plex project, and is not supported 
+*DISCLAIMER: This project is not an official Plex project, and is not supported
 or endorsed by Plex.*
 
-This is an SELinux policy module that defines a domain to confine Plex Media 
+This is an SELinux policy module that defines a domain to confine Plex Media
 Server and associated processes. By default, Plex Media Server runs in the
 `initrc_t` domain. This gives Plex Media Server far more access to the system
 than it needs to do its job. Installing this policy module will confine Plex
 Media Server in its own domain with a tailored set of access controls.
 
-**This policy module has received only limited testing and may not allow all
-Plex Media Server features to operate correctly at this time.** It has been
-developed for CentOS 6.6 and may not work correctly in other distros yet. 
+This policy module should not interfere with Plex's normal operation except
+where noted (i.e Web UI file browser). If you find something is not working
+correctly please open an issue.
 
 Bug reports and patches are welcome.
+
+### Support Status
+
+Supported Platforms: CentOS 6, CentOS 7
+
+Supported Plex Media Server Version: 0.9.12.1.1079-b655370.x86_64
+
+### Current Release Notes
+
+The current version of Plex Media Server ships with a library
+`/usr/lib/plexmediaserver/libgnsdk_dsp.so.3.07.5` that has the `execstack` flag
+set. This flag must be cleared for SELinux to allow Plex to run.
+
+This can be done with the `execstack` command (part of the `prelink` package)
+as root.
+
+    # execstack -c /usr/lib/plexmediaserver/libgnsdk_dsp.so.3.07.5
 
 
 ## Building
@@ -31,7 +48,7 @@ packages installed:
 
 	$ make
 
-### Install 
+### Install
 
 Installs the policy package and relabels Plex Media Server files to new file
 contexts.
@@ -43,7 +60,7 @@ contexts.
 ### Uninstall
 
 Uninstalls the policy module from the system and relabels Plex Media Server
-files to the default file contexts. 
+files to the default file contexts.
 
 (as root)
 
@@ -83,7 +100,7 @@ the `ls` command.
 A file's security context can be changed temporarily using `chcon`. These
 changes will not survive a relabeling.
 
-	$ chcon -R /usr/share/my_media_library 
+	$ chcon -R /usr/share/my_media_library
 
 A file's security context can be changed permanently by using `semanage fcontext`
 to define the default security context for a given set of files and then using
@@ -91,7 +108,7 @@ to define the default security context for a given set of files and then using
 
 	$ semanage fcontext -a -t plex_content_t "/usr/share/my_media_library(/.*)?"
 	$ restorecon -v -R /usr/share/my_media_library
-	
+
 This policy module defines the following file contexts:
 
 ##### plex\_content\_t and plex\_content\_rw\_t
@@ -164,7 +181,7 @@ shared file contexts:
 * `public_content_rw_t`
 
 This is useful if you want label media files to be readable by processes in
-domains other than `plex_t` (Apache, NFS, Samba, FTP, etc) 
+domains other than `plex_t` (Apache, NFS, Samba, FTP, etc)
 <br />
 <br />
 
@@ -173,7 +190,7 @@ domains other than `plex_t` (Apache, NFS, Samba, FTP, etc)
 Processes confined by `plex_t` have the following network capabilities:
 
 * May connect TCP sockets to `port_t`
-* May connect TCP sockets to `http_port_t` 
+* May connect TCP sockets to `http_port_t`
 * May bind UDP sockets to `port_t`
 * May send and receive UDP packets to/from all ports.
 
@@ -197,7 +214,7 @@ The status of booleans can be inspected using `getsebool`
 A boolean can be turned on or off using `setsebool`
 
 (as root)
-	
+
 `# setsebool allow_plex_list_all_dirs on`
 
 A `-P` option can be passed to `setsebool` that makes the setting persist
@@ -220,14 +237,14 @@ all files and directories.
 
 ##### allow\_plex\_list\_all\_dirs
 
-Allow processes contained by `plex_t` to list (search and read) all directories. 
+Allow processes contained by `plex_t` to list (search and read) all directories.
 
 Note that this boolean will allow the directory browser in Plex's Web UI to work
 correctly. Attempting to use the directory browser without enabling this boolean
 will cause a large number of AVC denials to be logged. If this boolean is off,
 directory paths should be typed in the path bar instead of browsed for.
 <br />
-<br /> 
+<br />
 
 ##### allow\_plex\_anon\_write
 

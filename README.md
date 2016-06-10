@@ -42,6 +42,7 @@ packages installed:
 
 * make
 * selinux-policy
+* selinux-policy-devel
 * policycoreutils-python
 
 ### Build
